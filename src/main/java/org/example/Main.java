@@ -48,16 +48,7 @@ public class Main {
                     System.out.print("ID de la tarea: ");
                     int id = scanner.nextInt();
                     scanner.nextLine(); // Limpiar buffer
-                    System.out.print("Nuevo Título: ");
-                    String titulo = scanner.nextLine();
-                    System.out.print("Nuevo Contexto: ");
-                    String contexto = scanner.nextLine();
-                    System.out.print("Nueva Fecha (YYYY-MM-DD): ");
-                    Date fecha = Date.valueOf(scanner.nextLine());
-                    System.out.print("¿Activo? (true/false): ");
-                    boolean activo = scanner.nextBoolean();
-                    scanner.nextLine(); // Limpiar buffer
-                    DBDDL.actualizarTarea(conexion, id, titulo, contexto, fecha, activo);
+                    DBDDL.actualizarTareaInteractivo(conexion, id);
                 }
                 case 3 -> {
                     System.out.println("Has elegido eliminar una tarea.");
@@ -67,7 +58,6 @@ public class Main {
                     DBDDL.eliminarTarea(conexion, id);
                 }
                 case 4 -> {
-                    System.out.println("Listado de tareas:");
                     DBDDL.listarTareas(conexion);
                 }
                 case 5 -> System.out.println("Saliendo...");
@@ -80,17 +70,26 @@ public class Main {
     }
 }
 
+/*
+REQUISITOS:
+hacer un crud de una app
+ */
 
-    /*
-    REQUISITOS:
-    hacer un crud de una app
-     */
+/*
+HISTORIAS DE USUARIO: (en Scrum se usa)
+Como usuario, quiero:
+Para:
+ */
+//aqui se deberia d epoiner una funcion con map, para poder
+//enlazar el archivo .env, este nunca se sube
 
-    /*
-    HISTORIAS DE USUARIO: (en Scrum se usa)
-    Como usuario, quiero:
-    Para:
-     */
-    //aqui se deberia d epoiner una funcion con map, para poder
-    //enlazar el archivo .env, este nunca se sube
 
+/*
+crear una instancia que tiene que antes de crear la bd,
+es decir crear pirmero el obj y una vez ya creado, rellenarla
+ */
+
+/*
+los datos de la tabla se iran guardando segun el usuario vaya realiando acciones
+para no tener
+ */
