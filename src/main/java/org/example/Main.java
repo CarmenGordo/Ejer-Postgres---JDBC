@@ -6,90 +6,79 @@ import org.example.modelo.DBDDL;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws SQLException {
         System.out.println("¡Bienvenido a tu nuevo gestor de tareas!");
-        Connection conexion = Conexion.getConnection();
-        DBDDL.crearTabla(conexion);
-        Conexion.leerEnv();
-        Scanner scanner = new Scanner(System.in);
-        int opcion;
 
-        do {
-            System.out.println("\n--- MENÚ DE GESTIÓN DE TAREAS ---");
-            System.out.println("1. Insertar tarea");
-            System.out.println("2. Actualizar tarea");
-            System.out.println("3. Eliminar tarea");
-            System.out.println("4. Listar tareas");
-            System.out.println("5. Salir");
-            System.out.print("Elige una opción: ");
+        // Leer configuración desde el archivo .env
+        Map<String, String> envConfig = Conexion.cargarEnv();
+        if (envConfig.isEmpty()) {
+            System.err.println("Error: No se pudo cargar el archivo .env. Saliendo...");
+            return;
+        }
 
-            opcion = scanner.nextInt();
-            scanner.nextLine(); // Limpiar buffer
+        Connection conexion = null;
+        try {
+            conexion = Conexion.getConnection();
+            DBDDL.crearTabla(conexion);
 
-            switch (opcion) {
-                case 1 -> {
-                    System.out.println("Has elegido insertar una tarea.");
-                    System.out.print("Título: ");
-                    String titulo = scanner.nextLine();
-                    System.out.print("Contenido: ");
-                    String contexto = scanner.nextLine();
-                    System.out.print("Fecha (YYYY-MM-DD): ");
-                    Date fecha = Date.valueOf(scanner.nextLine());
-                    System.out.print("¿Activo? (true/false): ");
-                    boolean activo = scanner.nextBoolean();
-                    scanner.nextLine(); // Limpiar buffer
-                    DBDDL.insertarTarea(conexion, titulo, contexto, fecha, activo);
-                }
-                case 2 -> {
-                    System.out.println("Has elegido actualizar una tarea.");
-                    System.out.print("ID de la tarea: ");
-                    int id = scanner.nextInt();
-                    scanner.nextLine(); // Limpiar buffer
-                    DBDDL.actualizarTareaInteractivo(conexion, id);
-                }
-                case 3 -> {
-                    System.out.println("Has elegido eliminar una tarea.");
-                    System.out.print("ID de la tarea: ");
-                    int id = scanner.nextInt();
-                    scanner.nextLine(); // Limpiar buffer
-                    DBDDL.eliminarTarea(conexion, id);
-                }
-                case 4 -> {
-                    DBDDL.listarTareas(conexion);
-                }
-                case 5 -> System.out.println("Saliendo...");
-                default -> System.out.println("Opción inválida. Intenta de nuevo.");
-            }
-        } while (opcion != 5);
+            Scanner scanner = new Scanner(System.in);
+            int opcion;
 
-        scanner.close();
-        Conexion.cerrarConexion(conexion);
+            do {
+                System.out.println("\n--- MENÚ DE GESTIÓN DE TAREAS ---");
+                System.out.println("1. Insertar tarea");
+                System.out.println("2. Actualizar tarea");
+                System.out.println("3. Eliminar tarea");
+                System.out.println("4. Listar tareas");
+                System.out.println("5. Salir");
+                System.out.print("Elige una opción: ");
+
+                opcion = scanner.nextInt();
+                scanner.nextLine(); // Limpiar buffer
+
+                switch (opcion) {
+                    case 1 -> {
+                        System.out.println("Has elegido insertar una tarea.");
+                        System.out.print("Título: ");
+                        String titulo = scanner.nextLine();
+                        System.out.print("Contenido: ");
+                        String contexto = scanner.nextLine();
+                        System.out.print("Fecha (YYYY-MM-DD): ");
+                        Date fecha = Date.valueOf(scanner.nextLine());
+                        System.out.print("¿Activo? (true/false): ");
+                        boolean activo = scanner.nextBoolean();
+                        scanner.nextLine(); // Limpiar buffer
+                        DBDDL.insertarTarea(conexion, titulo, contexto, fecha, activo);
+                    }
+                    case 2 -> {
+                        System.out.println("Has elegido actualizar una tarea.");
+                        System.out.print("ID de la tarea: ");
+                        int id = scanner.nextInt();
+                        scanner.nextLine(); // Limpiar buffer
+                        DBDDL.actualizarTareaInteractivo(conexion, id);
+                    }
+                    case 3 -> {
+                        System.out.println("Has elegido eliminar una tarea.");
+                        System.out.print("ID de la tarea: ");
+                        int id = scanner.nextInt();
+                        scanner.nextLine(); // Limpiar buffer
+                        DBDDL.eliminarTarea(conexion, id);
+                    }
+                    case 4 -> DBDDL.listarTareas(conexion);
+                    case 5 -> System.out.println("Saliendo...");
+                    default -> System.out.println("Opción inválida. Intenta de nuevo.");
+                }
+            } while (opcion != 5);
+
+            scanner.close();
+        } catch (SQLException e) {
+            System.err.println("Error en la conexión a la base de datos: " + e.getMessage());
+        } finally {
+            Conexion.cerrarConexion(conexion);
+        }
     }
 }
-
-/*
-REQUISITOS:
-hacer un crud de una app
- */
-
-/*
-HISTORIAS DE USUARIO: (en Scrum se usa)
-Como usuario, quiero:
-Para:
- */
-//aqui se deberia d epoiner una funcion con map, para poder
-//enlazar el archivo .env, este nunca se sube
-
-
-/*
-crear una instancia que tiene que antes de crear la bd,
-es decir crear pirmero el obj y una vez ya creado, rellenarla
- */
-
-/*
-los datos de la tabla se iran guardando segun el usuario vaya realiando acciones
-para no tener
- */
