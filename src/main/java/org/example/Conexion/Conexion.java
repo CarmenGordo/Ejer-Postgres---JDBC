@@ -31,21 +31,6 @@ public class Conexion {
         return env;
     }
 
-    public static String construirConnectionString(String url, String host, String port, String bd, String user, String password) {
-        if (url == null || host == null || port == null || bd == null || user == null || password == null) {
-            System.err.println("Error: Faltan parámetros de conexión.");
-            return null;
-        }
-        return String.format("%s%s:%s/%s?user=%s&password=%s", url, host, port, bd, user, password);
-    }
-
-    public static String leerSupabaseConnectionString(Map<String, String> env) {
-        String url = env.get("SUPABASE");
-        String user = env.get("USER_SUPABASE");
-        String password = env.get("PASSWORD_SUPABASE");
-        return construirConnectionString(url, "", "", "", user, password);
-    }
-
     public static String leerLocalConnectionString(Map<String, String> env) {
         String url = env.get("URL");
         String host = env.get("HOST");
@@ -56,17 +41,24 @@ public class Conexion {
         return construirConnectionString(url, host, port, bd, user, password);
     }
 
+    public static String construirConnectionString(String url, String host, String port, String bd, String user, String password) {
+        if (url == null || host == null || port == null || bd == null || user == null || password == null) {
+            System.err.println("Error: Faltan parámetros de conexión.");
+            return null;
+        }
+        return String.format("%s%s:%s/%s?user=%s&password=%s", url, host, port, bd, user, password);
+    }
+
     public static Connection getConnection() throws SQLException {
         Map<String, String> env = cargarEnv();
-
+        String SUPABASE = env.get("SUPABASE");
         // Intentar conexión a Supabase primero
-        String supabaseConnectionString = leerSupabaseConnectionString(env);
         String localConnectionString = leerLocalConnectionString(env);
 
-        if (supabaseConnectionString != null) {
+        if (SUPABASE != null) {
             try {
                 System.out.println("Intentando conectar a Supabase...");
-                return DriverManager.getConnection(supabaseConnectionString);
+                return DriverManager.getConnection(SUPABASE);
             } catch (SQLException e) {
                 System.err.println("Error al conectar a Supabase: " + e.getMessage());
             }
@@ -79,21 +71,6 @@ public class Conexion {
         }
 
         throw new SQLException("No se pudo establecer la conexión: parámetros incorrectos o conexión fallida.");
-    }
-
-    public static void testConexion() {
-        try (Connection connection = getConnection()) {
-            System.out.println("Conexión exitosa a la base de datos.");
-
-            try (Statement stmt = connection.createStatement()) {
-                stmt.executeQuery("SELECT 1");
-                System.out.println("Consulta ejecutada con éxito.");
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Error al conectar a la base de datos.");
-            e.printStackTrace();
-        }
     }
 
     public static void cerrarConexion(Connection connection) {
